@@ -7,25 +7,33 @@ const getCsrfToken = () => {
 };
 
 /**
- * @param {Object} auth - Datos de autenticación del usuario
- * @returns {Object} Estado para gestionar registros de asistencia
+ * Hook para gestionar los datos de asistencia.
+ * - loadHoy(): Carga las asistencias registradas en el día
+ * - loadAsistencias(): Carga todos los registros de attendance_records
  */
 export function useAsistenciaData(auth) {
+  const [trabajadoresHoy, setTrabajadoresHoy] = useState([]);
   const [asistencias, setAsistencias] = useState([]);
+  const [statsHoy, setStatsHoy] = useState({ total: 0, presentes: 0, ausentes: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ── Cargar asistencias ───
-  const loadAsistencias = useCallback(async () => {
+  // ── Cargar vista HOY (workers + attendance merged) ───
+  const loadHoy = useCallback(async () => {
     try {
-      const response = await fetch('/api/asistenciakrsft/list');
+      const response = await fetch('/api/asistenciakrsft/hoy');
       const result = await response.json();
 
       if (result.success) {
-        setAsistencias(result.data || []);
+        setTrabajadoresHoy(result.data || []);
+        setStatsHoy({
+          total: result.total_registros ?? result.total_presentes ?? 0,
+          presentes: result.total_presentes || 0,
+          ausentes: result.total_ausentes || 0,
+        });
         setError(null);
       } else {
-        setError(result.message || 'Error al cargar los registros de asistencia');
+        setError(result.message || 'Error al cargar datos de hoy');
       }
     } catch (err) {
       setError(err.message || 'Error de conexión');
@@ -34,6 +42,23 @@ export function useAsistenciaData(auth) {
     }
   }, []);
 
+  // ── Cargar todos los registros (para la vista ASISTENCIAS) ───
+  const loadAsistencias = useCallback(async (params = {}) => {
+    try {
+      const searchParams = new URLSearchParams(params).toString();
+      const response = await fetch(`/api/asistenciakrsft/list?${searchParams}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setAsistencias(result.data || []);
+        setError(null);
+      }
+    } catch (err) {
+      setError(err.message || 'Error de conexión');
+    }
+  }, []);
+
+  // ── Registrar asistencia por DNI ───
   const createAsistencia = useCallback(async (payload) => {
     try {
       const response = await fetch('/api/asistenciakrsft/store', {
@@ -46,14 +71,14 @@ export function useAsistenciaData(auth) {
       });
       const result = await response.json();
       if (result.success) {
-        await loadAsistencias();
+        await loadHoy(); // Refresh HOY view
         return { success: true, message: result.message };
       }
       return { success: false, message: result.message || 'Error al crear registro' };
     } catch (err) {
       return { success: false, message: err.message || 'Error de conexión' };
     }
-  }, [loadAsistencias]);
+  }, [loadHoy]);
 
   const updateAsistencia = useCallback(async (id, payload) => {
     try {
@@ -67,14 +92,14 @@ export function useAsistenciaData(auth) {
       });
       const result = await response.json();
       if (result.success) {
-        await loadAsistencias();
+        await loadHoy();
         return { success: true, message: result.message };
       }
       return { success: false, message: result.message || 'Error al actualizar registro' };
     } catch (err) {
       return { success: false, message: err.message || 'Error de conexión' };
     }
-  }, [loadAsistencias]);
+  }, [loadHoy]);
 
   const deleteAsistencia = useCallback(async (id) => {
     try {
@@ -86,33 +111,40 @@ export function useAsistenciaData(auth) {
       });
       const result = await response.json();
       if (result.success) {
-        await loadAsistencias();
+        await loadHoy();
         return { success: true, message: result.message };
       }
       return { success: false, message: result.message || 'Error al eliminar registro' };
     } catch (err) {
       return { success: false, message: err.message || 'Error de conexión' };
     }
-  }, [loadAsistencias]);
+  }, [loadHoy]);
 
-  // ── Cargar data inicial ───
+  // ── Initial load ───
   useEffect(() => {
-    loadAsistencias();
-  }, [loadAsistencias]);
+    loadHoy();
+  }, [loadHoy]);
 
-  // ── Polling cada 30 segundos (silencioso) ───
+  // ── Polling (silent refresh) ───
   useEffect(() => {
     const interval = setInterval(() => {
-      loadAsistencias();
+      loadHoy();
     }, POLLING_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [loadAsistencias]);
+  }, [loadHoy]);
 
   return {
+    // HOY view data
+    trabajadoresHoy,
+    statsHoy,
+    // All records (ASISTENCIAS tab)
     asistencias,
+    loadAsistencias,
+    // State
     loading,
     error,
+    // CRUD
     createAsistencia,
     updateAsistencia,
     deleteAsistencia,

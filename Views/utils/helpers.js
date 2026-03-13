@@ -18,8 +18,12 @@ export function formatAsistencia(asistencia) {
 export function validateAsistenciaData(data) {
   const errors = {};
 
-  if (!data.trabajador_nombre?.trim()) {
-    errors.trabajador_nombre = 'El nombre del trabajador es requerido';
+  if (!/^\d{8}$/.test(data.dni || '')) {
+    errors.dni = 'El DNI debe tener 8 dígitos';
+  }
+
+  if (!data.trabajador_id) {
+    errors.dni = errors.dni || 'Debe seleccionar un trabajador válido';
   }
 
   if (!data.fecha) {
@@ -38,13 +42,11 @@ export function validateAsistenciaData(data) {
  */
 export function createEmptyAsistencia() {
   return {
+    trabajador_id: null,
     trabajador_nombre: '',
     dni: '',
     area: '',
     fecha: new Date().toISOString().split('T')[0],
     hora_entrada: '',
-    hora_salida: '',
-    estado: true,
-    observaciones: '',
   };
 }

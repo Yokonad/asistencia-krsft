@@ -9,5 +9,12 @@
   "gradient": "#10B981",
   "author": "yokonad",
   "enabled": true,
-  "dependencies": []
+  "dependencies": [],
+  "permissions": [
+    { "action": "access", "display_name": "Asistencia: Acceder", "description": "Permite ver el módulo de Asistencia en el dashboard y acceder a su página principal" },
+    { "action": "view", "display_name": "Asistencia: Ver", "description": "Permite visualizar los registros de asistencia diaria, conteos por estado (presente, falta, tardanza) y filtros" },
+    { "action": "create", "display_name": "Asistencia: Crear", "description": "Habilita el botón para registrar la asistencia del personal, marcando presentes, faltas y tardanzas" },
+    { "action": "update", "display_name": "Asistencia: Editar", "description": "Permite corregir registros de asistencia existentes, cambiar estados y actualizar observaciones" },
+    { "action": "delete", "display_name": "Asistencia: Eliminar", "description": "Muestra el botón de eliminar para borrar registros de asistencia" }
+  ]
 }

@@ -7,15 +7,13 @@ import {
 
 function StatCard({ title, value, icon, iconBg, iconColor }) {
   return (
-    <article className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-      <div className="flex items-center gap-3 min-w-0">
-        <span className={`inline-flex size-9 items-center justify-center rounded-full ${iconBg} ${iconColor}`}>
-          {icon}
-        </span>
-        <div className="min-w-0">
-          <p className="text-xl font-semibold text-gray-900 leading-tight">{value}</p>
-          <p className="text-xs text-gray-500 truncate mt-1">{title}</p>
-        </div>
+    <article className="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4">
+      <span className={`rounded-full p-2.5 ${iconBg} ${iconColor}`}>
+        {icon}
+      </span>
+      <div>
+        <p className="text-xl font-bold text-gray-900 leading-tight">{value}</p>
+        <p className="text-xs text-gray-500 mt-0.5">{title}</p>
       </div>
     </article>
   );
@@ -23,7 +21,7 @@ function StatCard({ title, value, icon, iconBg, iconColor }) {
 
 export default function AsistenciaStats({ total, presentes, ausentes, hoy }) {
   return (
-    <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="Total Registros"
         value={total}

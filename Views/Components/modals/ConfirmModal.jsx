@@ -23,23 +23,40 @@ function ConfirmModal({
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="sm">
-            <div className="text-center px-6 py-6">
-                <div className={`mx-auto mb-4 flex size-14 items-center justify-center rounded-full ${
-                    isDanger ? 'bg-red-100' : 'bg-blue-100'
+            <div className="text-center px-6 py-8">
+                <div className={`mx-auto mb-5 flex size-16 items-center justify-center rounded-full ${
+                    isDanger ? 'bg-red-50 text-red-500' : 'bg-[#e5fcf5] text-[#00BFA6]'
                 }`}>
-                    <Icon className={`size-7 ${isDanger ? 'text-red-600' : 'text-blue-600'}`} />
+                    <Icon className="size-8" />
                 </div>
 
-                <h2 className="text-lg font-bold text-gray-900">{title}</h2>
-                <p className="mt-2 text-sm text-pretty text-gray-500 leading-relaxed">{message}</p>
+                <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+                <p className="mt-3 text-[15px] font-medium text-gray-500 leading-relaxed text-balance">{message}</p>
 
-                <footer className="mt-6 flex gap-3">
-                    <Button variant="secondary" onClick={onClose} disabled={processing} className="flex-1">
+                <footer className="mt-8 flex gap-3">
+                    <button 
+                      type="button" 
+                      onClick={onClose} 
+                      disabled={processing} 
+                      className="flex-1 rounded-md bg-gray-100 hover:bg-gray-200 py-2.5 text-[14px] font-semibold text-gray-600 transition-colors"
+                    >
                         Cancelar
-                    </Button>
-                    <Button variant={resolvedVariant} onClick={onConfirm} disabled={processing} loading={processing} className="flex-1">
-                        {processing ? 'Procesando...' : actionLabel}
-                    </Button>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={onConfirm} 
+                      disabled={processing} 
+                      className={`flex-1 rounded-md py-2.5 text-[14px] font-semibold text-white shadow-sm transition-colors text-center inline-flex justify-center items-center gap-2 ${
+                        isDanger ? 'bg-[#EF4444] hover:bg-red-600' : 'bg-[#00BFA6] hover:bg-[#00a38d]'
+                      }`}
+                    >
+                        {processing ? '...' : (
+                            <>
+                                {!isDanger && <Icon className="size-4" />}
+                                {actionLabel}
+                            </>
+                        )}
+                    </button>
                 </footer>
             </div>
         </Modal>
